@@ -1,0 +1,105 @@
+ <!doctype html>
+<html>
+<head>
+ <!-- 
+
+-->
+
+<link href="data:image/x-icon;base6r4,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAP//AP///wANAP8A5Dz6ABueRwAAt/8A6BonABo86AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAREREREREREREREAAAEREREREQCIgREREd3dwAAB3d3d3d3d3d3d3d3d3d3d3d3d3VVVVVVVQAFVVAAVVVQIiBRAiIBEQIAIBECAAERAgAgFgIABmYCIiBmAiIGZgIiIGYCIgZmYCIAaIAAMzMzAAiIiIiIiIiIiIiIiIiIiIiIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" rel="icon" type="image/x-icon">
+<title>SDR Data Browser</title>
+<script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.js"></script>
+<script src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<div id = "qrcode"></div>
+<script>
+
+control = {};
+x0=0;
+y0=0;
+
+control.z = 0;//scroll wheel to zoom
+control.x = 0;//click and drag to change
+control.y = 0;//click and drag to change
+savecontrol();
+
+function setup() {
+    createCanvas(innerWidth,innerHeight - 100);
+}
+
+function draw(){
+    //fetch data.json
+    //if it's changed, plot it
+    
+    control.x  = Math.round(100*mouseX/width);
+    control.y = Math.round(100*mouseY/height);
+    if(control.y > 100){
+        control.y = 100;
+    }
+
+    clear();
+    background(255);
+    textSize(75);
+    text("scroll z = " + control.z.toString() + " clicks",100,100);
+    text("x = " + control.x.toString() + " %",100,200);
+    text("y = " + control.y.toString() + " %",100,300);
+    
+}
+
+function savecontrol(){
+    data = JSON.stringify(control,null,"   ");
+    var httpc = new XMLHttpRequest();
+    var url = "save-file.php";        
+    httpc.open("POST", url, true);
+    httpc.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+    httpc.send("data="+data+"&filename=control.json");//send text to save-file.php    
+}
+
+function mouseWheel(event) {
+    if (event.delta > 0) {
+        control.z++;
+        savecontrol();
+    }
+    else {
+        control.z--;
+        savecontrol();
+    }
+
+}
+
+
+function mouseClicked() {
+
+}
+codesquaresize = 90;
+globalurl = "https://github.com/lafefspietz/sdr-data-browser";
+//globalurl = window.location.href;
+qrcode = new QRCode(document.getElementById("qrcode"), {
+	text: globalurl,
+	width: codesquaresize,
+	height: codesquaresize,
+	colorDark : "#000000",
+	colorLight : "#ffffff",
+	correctLevel : QRCode.CorrectLevel.H
+});
+
+
+</script>
+<style>
+main{
+    position:absolute;
+    left:0px;
+    top:0px;
+    background-color:#f0f0ff;
+}
+#qrcode{
+    position:absolute;
+    left:2px;
+    bottom:2px;
+}
+body{
+    overflow:hidden;
+}
+</style>
+</body>
+</html>
