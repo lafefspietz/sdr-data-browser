@@ -12,11 +12,24 @@
 </head>
 <body>
 <div id = "qrcode"></div>
+<div id = "controlbar">
+    <a href = "edit-index.html">edit this page</a>
+    <table>
+        <tr>
+            <td class = "button" id = "verticalbutton">vertical slice</td>
+            <td class = "button" id = "horizontalbutton">horizontal slice</td>
+        </tr>
+        <tr>
+            <td class = "button" id = "mode1button">mode 1</td>
+            <td class = "button" id = "mode2button">mode 2</td>
+        </tr>
+    </table>
+</div>
 <script>
 
 control = {};
-x0=0;
-y0=0;
+x0 = 0;
+y0 = 0;
 
 control.z = 0;//scroll wheel to zoom
 control.x = 0;//click and drag to change
@@ -27,9 +40,32 @@ function setup() {
     createCanvas(innerWidth,innerHeight - 100);
 }
 
+dataindexindex = 0;
+
 function draw(){
     //fetch data.json
     //if it's changed, plot it
+    
+    //load python-status.json
+    var httpc = new XMLHttpRequest();
+    httpc.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            pythonstatus = JSON.parse(this.responseText);
+            if(pythonstatus.dataindex){
+                var httpcp = new XMLHttpRequest();
+                httpcp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        jsondata = JSON.parse(this.responseText);
+                    }
+                };
+                httpcp.open("GET", "load-file.php?filename=data.json", true);
+                httpcp.send();
+                
+            }
+        }
+    };
+    httpc.open("GET", "load-file.php?filename=python-status.json", true);
+    httpc.send();   
     
     control.x  = Math.round(100*mouseX/width);
     control.y = Math.round(100*mouseY/height);
@@ -45,6 +81,11 @@ function draw(){
     text("y = " + control.y.toString() + " %",100,300);
     
 }
+
+function plotdata(){
+    
+}
+
 
 function savecontrol(){
     data = JSON.stringify(control,null,"   ");
@@ -67,7 +108,6 @@ function mouseWheel(event) {
 
 }
 
-
 function mouseClicked() {
 
 }
@@ -86,6 +126,9 @@ qrcode = new QRCode(document.getElementById("qrcode"), {
 
 </script>
 <style>
+body{
+    overflow:hidden;
+}
 main{
     position:absolute;
     left:0px;
@@ -97,8 +140,23 @@ main{
     left:2px;
     bottom:2px;
 }
-body{
-    overflow:hidden;
+#controlbar{
+    position:absolute;
+    bottom:0px;
+    right:0px;
+    left:100px;
+    height:98px;
+}
+.button{
+    border:solid;
+    text-align:center;
+    cursor:pointer;
+}
+.button:hover{
+    background-color:green;
+}
+.button:active{
+    background-color:yellow;
 }
 </style>
 </body>
